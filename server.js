@@ -4,7 +4,7 @@ const multer = require('multer');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = 5500;
 
 // 이미지 저장 경로 설정
 const storage = multer.diskStorage({

@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt'); // 비밀번호 암호화
 const nodemailer = require('nodemailer'); //메일 발송
 
 const app = express();
-const port = 3000;
+const port = 5500;
 
 //앱 세팅
 app.set("views", "./views");
