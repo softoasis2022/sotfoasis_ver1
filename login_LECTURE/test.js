@@ -112,6 +112,44 @@ app.get("/login", (req, res) => {
     res.render("home/login");
 });
 
+// 로그인 처리
+app.post("/login", async (req, res) => {
+    const { username, password, userType } = req.body;
+    
+    // 배열에서 사용자 찾기
+    let user;
+    
+    if (userType === 'customer') {          // 구매자 배열에서 사용자 찾기
+        user = customers.find(u => u.username === username);
+    } 
+    else if (userType === 'seller') {       // 판매자 배열에서 사용자 찾기
+        user = sellers.find(u => u.username === username);
+    }
+    
+    if (!user) {                            // 사용자를 못 찾았을때
+        return res.status(400).send(`
+            아이디 또는 비밀번호가 잘못되었습니다.<br>
+            <a href='/login'><button>로그인 페이지로 이동하기</button></a>
+        `);
+    }
+
+    // 비밀번호 확인 (입력된 비밀번호와 해시된 비밀번호 비교)
+    const Match = await bcrypt.compare(password, user.password);
+
+    if (userType === 'customer') {
+        res.render("home/customer_main", { name: user.name });      //구매자 매인 페이지로
+    } 
+    else if (userType === 'seller') {
+        res.render("home/seller_main", { name: user.name });        //판매자 매인 페이지로
+    }
+    else {
+        res.status(400).send(`
+            아이디 또는 비밀번호가 잘못되었습니다.<br>
+            <a href='/login'><button>로그인 페이지로 이동하기</button></a>
+        `); //비밀번호 오류
+    }
+});
+
 // 서버 시작
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
