@@ -2,9 +2,44 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+
+const cheerio = require('cheerio');
+const http = require('http');
+const url = require('url');
+const querystring = require('querystring');
 
 const app = express();
-const PORT = 5500;
+const PORT = 80;
+
+path.join(__dirname,"/../version","page.json");
+fs.readFileSync(path.join(__dirname,"/../version","page.json"), 'utf-8');
+
+let pagever = JSON.parse(fs.readFileSync(path.join(__dirname,"/../version","page.json"), 'utf-8'));  //페이지 버전을 json으로 저장 하는 변수
+
+
+
+let page; //페이지정보를 보내는 데이터 저장
+
+//데이터 저장 경로
+const data_base = path.join("D");
+const page_loot = path.join(__dirname,"/../page");
+
+
+//html 정보가 저장된 루트
+const seller_page_loot = path.join(page_loot,"seller");
+const seller_pagetaplate_loot = path.join(page_loot,"seller","tamplate");
+
+const meta_page_loot = path.join(page_loot,"meta");
+const meta_pagetamplate_loot = path.join(page_loot,"meta","tamplate");
+
+const industry_page_loot = path.join(page_loot,"meta");
+const industry_pagetamplate_loot = path.join(page_loot,"meta","tamplate");
+
+/*
+
+
+*/
 
 // 이미지 저장 경로 설정
 const storage = multer.diskStorage({
@@ -24,6 +59,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // 장바구니 초기화
 let products = [];
 let cart = [];
+
+
 
 // uploads 디렉토리를 static 파일로 제공
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -106,7 +143,18 @@ app.get('/', (req, res) => {
     `);
 });
 
-// 상품 등록 폼 페이지
+
+app.get('/seller', (req, res) => {
+    
+    let tamplate = path.join();
+
+    page = applyPageToTemplate();
+
+
+    res.send();
+});
+
+// 상품 등록 폼 페이지 seller
 app.get('/register', (req, res) => {
     res.send(`
         <!DOCTYPE html>
@@ -154,7 +202,7 @@ app.get('/register', (req, res) => {
     `);
 });
 
-// 상품 등록 엔드포인트
+// 상품 등록 엔드포인트 seller
 app.post('/api/products', upload.single('image'), (req, res) => {
     const { name, description, price } = req.body;
 
@@ -210,8 +258,7 @@ app.post('/api/products', upload.single('image'), (req, res) => {
         </html>
     `);
 });
-
-// 상품 목록 조회 엔드포인트
+// 상품 목록 조회 엔드포인트 seller
 app.get('/api/products', (req, res) => {
     const productList = products.map(product => `
         <div class="col-md-4">
@@ -259,7 +306,7 @@ app.get('/api/products', (req, res) => {
         </html>
     `);
 });
-// 장바구니에 상품 추가
+// 장바구니에 상품 추가 meta
 app.post('/api/cart/add', (req, res) => {
     const { productId } = req.body;
     const product = products.find(p => p.id == productId);
@@ -276,8 +323,7 @@ app.post('/api/cart/add', (req, res) => {
         return res.status(404).json({ message: '상품을 찾을 수 없습니다.' });
     }
 });
-
-// 장바구니 조회 엔드포인트
+// 장바구니 조회 엔드포인트 meta
 app.get('/cart', (req, res) => {
     if (cart.length === 0) {
         return res.send(`
@@ -345,8 +391,7 @@ app.get('/cart', (req, res) => {
         </html>
     `);
 });
-
-// 상품 등록 폼 페이지
+// 상품 등록 폼 페이지 
 app.get('/register', (req, res) => {
     res.send(`
         <h1>상품 등록하기</h1>
@@ -370,3 +415,13 @@ app.get('/register', (req, res) => {
 app.listen(PORT, () => {
     console.log(`서버가 http://localhost:${PORT}에서 실행 중입니다.`);
 });
+
+function applyPageToTemplate(templatePath, pagePath) {
+    let template = readfile(templatePath);
+    let pageContent = readfile(pagePath);
+    const mainPageRegex = /<div id="mainpage"><\/div>/;
+    return template.replace(mainPageRegex, `<div id="mainpage">${pageContent}</div>`);
+}
+function readfile(templatePath) {
+    return fs.readFileSync(templatePath, 'utf-8');
+}
