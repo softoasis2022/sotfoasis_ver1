@@ -1,3 +1,12 @@
+
+
+/*
+
+/seller를 제외한 모든 응답 앤드 포인트 수정해야 함
+
+*/
+
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer');
@@ -36,10 +45,7 @@ const meta_pagetamplate_loot = path.join(page_loot,"meta","tamplate");
 const industry_page_loot = path.join(page_loot,"meta");
 const industry_pagetamplate_loot = path.join(page_loot,"meta","tamplate");
 
-/*
 
-
-*/
 
 // 이미지 저장 경로 설정
 const storage = multer.diskStorage({
@@ -66,6 +72,19 @@ let cart = [];
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // 메인 페이지 라우트
+
+
+
+app.get('/seller', (req, res) => {
+    
+    let tamplate = path.join();
+
+    page = applyPageToTemplate();
+
+
+    res.send();
+});
+
 app.get('/', (req, res) => {
     const productList = products.map(product => `
         <div class="col-md-4">
@@ -141,17 +160,6 @@ app.get('/', (req, res) => {
         </body>
         </html>
     `);
-});
-
-
-app.get('/seller', (req, res) => {
-    
-    let tamplate = path.join();
-
-    page = applyPageToTemplate();
-
-
-    res.send();
 });
 
 // 상품 등록 폼 페이지 seller
