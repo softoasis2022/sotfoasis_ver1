@@ -346,6 +346,26 @@ app.get('/cart', (req, res) => {
     `);
 });
 
+// 상품 등록 폼 페이지
+app.get('/register', (req, res) => {
+    res.send(`
+        <h1>상품 등록하기</h1>
+        <form action="/api/products" method="POST" enctype="multipart/form-data">
+            <label for="name">이름:</label>
+            <input type="text" name="name" required><br>
+            <label for="description">설명:</label>
+            <input type="text" name="description" required><br>
+            <label for="price">가격:</label>
+            <input type="number" name="price" required><br>
+            <label for="image">이미지:</label>
+            <input type="file" name="image" required><br>
+            <button type="submit">등록</button>
+        </form>
+        <p><a href="/">홈으로</a></p>
+    `);
+});
+
+
 // 서버 시작
 app.listen(PORT, () => {
     console.log(`서버가 http://localhost:${PORT}에서 실행 중입니다.`);
