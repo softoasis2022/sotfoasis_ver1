@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스토어 이름</title>
+    <style>
+        #store_name{
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(90deg, #58FFEB, #FFF0BA);
+        }
+        #warp_store_set{
+            width: 100%;
+            height: fit-content;
+            display: flex;
+        }
+        #warp_store_set_menu{
+            width: fit-content;
+            height: fit-content;
+            background-color: darkgrey;
+        }
+    </style>
+</head>
+<body>
+    <div id="store_name">
+        
+    </div>
+    <div id="warp_store_set">
+        <div id="warp_store_set_menu">
+            <style>
+                #warp_set_menu1{
+                    padding: 30px;
+                }
+                #warp_set_submenu1{
+                    padding: 30px;
+                    
+                }
+            </style>
+            <div>
+                <div id="warp_set_menu1" onclick="menuclick(1)">
+                    상품 관리
+                </div>
+                <div id="warp_set_submenu1" style="display: none;" onclick="submenuclick()">
+                    서브 메뉴
+                </div>
+            </div>
+            
+            <div id="warp_set_menu2">
+                판매 관리
+            </div>
+            <div id="warp_set_menu3">
+                정산 관리
+            </div>
+            <div id="warp_set_menu4">
+                문의/리뷰
+            </div>
+            <div id="warp_set_menu5">
+                
+            </div>
+            <div id="warp_set_menu6">
+                
+            </div>
+        </div>
+        <div id="mainpage"></div>
+        <script>
+            function menuclick(i){
+                console.log(i);
+                console.log(typeof i);
+                console.log("fjfjfj" + String(i));
+                var menuItems = document.getElementById("warp_set_submenu" + String(i));
+
+                if (menuItems.style.display === "none") {
+                    menuItems.style.display = "block";
+                } else {
+                    menuItems.style.display = "none";
+                }
+            }
+            function submenuclick(){
+
+            }
+        </script>
+    </div>
+</body>
+</html>
