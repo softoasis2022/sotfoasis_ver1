@@ -1,8 +1,0 @@
-industry 폴더 : 기업 설명 페이지
-meta 폴더 : 메타커머스 페이지
-seller 폴더 : 판매자 센터 페이지
-
-main.js 만 사용
-
-템플릿 html은 변하지 않는 화면
-페이지 html은 변하는 화면 : <div id="mainpage"></div> 부분을 바꿔서 랜딩 또는 응답
