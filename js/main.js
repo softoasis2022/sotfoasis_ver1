@@ -17,6 +17,7 @@ const cheerio = require('cheerio');
 const http = require('http');
 const url = require('url');
 const querystring = require('querystring');
+const { console } = require('inspector');
 
 const app = express();
 const PORT = 80;
@@ -44,6 +45,34 @@ const meta_pagetamplate_loot = path.join(page_loot,"meta","tamplate");
 
 const industry_page_loot = path.join(page_loot,"meta");
 const industry_pagetamplate_loot = path.join(page_loot,"meta","tamplate");
+
+const versionfilePath = path.join(__dirname,"/../version","page.json");
+
+
+
+// 서버 시작
+app.listen(PORT, () => {
+    const version = ReadFile(versionfilePath);
+    console.log(version);
+    console.log(`서버가 http://localhost:${PORT}에서 실행 중입니다.`);
+});
+
+/*
+let page_version = {
+    "industry" : {
+        "page" : "0_0_1",
+        "tamplate" : "0_0_1"
+    },
+    "meta" : {
+        "page" : "0_0_1",
+        "tamplate" : "0_0_1"
+    },
+    "seller" : {
+        "page" : "0_0_1",
+        "tamplate" : "0_0_1"
+    }
+}
+*/
 
 
 
@@ -83,6 +112,19 @@ app.get('/seller', (req, res) => {
 
 
     res.send();
+});
+
+app.get('/sellerchat', (req, res) => {
+
+    
+    let pageX ;
+    let tamplate = path.join(page_loot,"seller","tamplate",`${page_version.seller.tamplate}.html`);
+    let page = path.join(page_loot,"seller","page","review_chat.html");
+
+    pageX = applyPageToTemplate();
+
+
+    res.send(pageX);
 });
 
 app.get('/', (req, res) => {
@@ -418,11 +460,19 @@ app.get('/register', (req, res) => {
     `);
 });
 //판매자센터ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-
-// 서버 시작
-app.listen(PORT, () => {
-    console.log(`서버가 http://localhost:${PORT}에서 실행 중입니다.`);
+app.post('/chat', (req, res) => {
+    const { action,fromuser,touser,chat } = req.body;
+    if(action=="start_storechat"){
+        chat(action,fromuser,touser,chat);
+    }
+    if(action=="plus_storechat"){
+        pluschat(action,fromuser,touser,chat);
+    }
 });
+
+
+
+
 
 function applyPageToTemplate(templatePath, pagePath) {
     let template = readfile(templatePath);
@@ -445,7 +495,11 @@ function chat(action,fromuser,touser,chat){
         let ranstr = generateRandomString(20);
         let chat_number = time+ ranstr ;
         create_storechat(path.join(data_base,"database","chat","store"),chat_number,fromuser,touser);
-        pluschat(chat_number,fromuser,touser,chat)
+        
+    }
+    
+    if(action=="plus_storechat"){
+        pluschat(chat_number,fromuser,touser,chat);
     }
 }
 function pluschat(chat_number,fromuser,touser,chat){
@@ -455,15 +509,8 @@ function pluschat(chat_number,fromuser,touser,chat){
     let chatjson = { 
         username : chat 
     }
-    
-    fs.writeFile(filePath, JSON.stringify(chatjson, null, 2), (err) => {
-        if (err) {
-            console.error('Error creating chat file:', err);
-        } else {//파일이 있을떄
-            console.log(`File ${chat_number}.json created successfully at ${Path}`);
-            
-        }
-    });
+    let chatinfo = ReadFile(filePath);
+    console.log(chatinfo,typeof(chatinfo));
     
     
 }
@@ -478,25 +525,9 @@ function findusername(userid){
     // 데이터베이스 루트 경로 (data_base가 이미 설정된 변수라고 가정)
     const filePath = path.join(data_base, "database", "user", `${userid}.json`);
 
-    // 1. 파일 읽기
-    fs.readFile(filePath, 'utf8', (err, data) => {
-        if (err) {
-            console.error(`Error reading user file for ${userid}:`, err);
-            return;
-        }
-
-        // 2. 읽은 파일을 JSON으로 파싱하기
-        let userData;
-        try {
-            userData = JSON.parse(data);
-            
-        } catch (parseErr) {
-            console.error('Error parsing JSON data:', parseErr);
-            return;
-        }
-
-        return userData.username;
-    });
+    const Username = ReadFile(filePath);
+    console.log(Username);
+    return Username;
 }
 function create_storechat(Path,chat_number,fromuser,touser){
     const filePath = path.join(Path, `${chat_number}.json`);
@@ -532,4 +563,24 @@ function generateRandomString(length) {
     }
 
     return result;
+}
+function ReadFile(filePath){
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error(`Error reading user file for `, err);
+            return;
+        }
+
+        // 2. 읽은 파일을 JSON으로 파싱하기
+        let userData;
+        try {
+            userData = JSON.parse(data);
+            
+        } catch (parseErr) {
+            console.error('Error parsing JSON data:', parseErr);
+            return;
+        }
+
+        return userData;
+    });
 }
