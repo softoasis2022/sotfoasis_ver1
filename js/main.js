@@ -31,7 +31,7 @@ let pagever = JSON.parse(fs.readFileSync(path.join(__dirname,"/../version","page
 let page; //페이지정보를 보내는 데이터 저장
 
 //데이터 저장 경로
-const data_base = path.join("D");
+const data_base = path.join("D","softoasis");
 const page_loot = path.join(__dirname,"/../page");
 
 
@@ -417,7 +417,7 @@ app.get('/register', (req, res) => {
         <p><a href="/">홈으로</a></p>
     `);
 });
-
+//판매자센터ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 // 서버 시작
 app.listen(PORT, () => {
@@ -432,4 +432,104 @@ function applyPageToTemplate(templatePath, pagePath) {
 }
 function readfile(templatePath) {
     return fs.readFileSync(templatePath, 'utf-8');
+}
+
+function chat(action,fromuser,touser,chat){
+    // 받아야 하는 데이터 : 액션 이름(action). 유저 아이디(fromuser), 챗 대상 아이디 (touser), 
+    // 불러올 데이터 : 시간(chattime), 
+    //액션 종류 : 스토어챗, 메타커머스쳇,
+    if(action=="start_storechat"){ //스토어 문의
+        //액션 변수 
+        //1.시간과 랜덤수를 합하여 채팅의 고유 번호를 매김
+        let time=get_time();
+        let ranstr = generateRandomString(20);
+        let chat_number = time+ ranstr ;
+        create_storechat(path.join(data_base,"database","chat","store"),chat_number,fromuser,touser);
+        pluschat(chat_number,fromuser,touser,chat)
+    }
+}
+function pluschat(chat_number,fromuser,touser,chat){
+    
+    const filePath = path.join(data_base,"database","chat","store",`${chat_number}.json`);
+    let username = findusername(userid);
+    let chatjson = { 
+        username : chat 
+    }
+    
+    fs.writeFile(filePath, JSON.stringify(chatjson, null, 2), (err) => {
+        if (err) {
+            console.error('Error creating chat file:', err);
+        } else {//파일이 있을떄
+            console.log(`File ${chat_number}.json created successfully at ${Path}`);
+            
+        }
+    });
+    
+    
+}
+function findusername(userid){
+    //userid hang05312
+    /*
+    저장되있는 데이터
+    {
+        "username" : "대표"
+    }
+    */
+    // 데이터베이스 루트 경로 (data_base가 이미 설정된 변수라고 가정)
+    const filePath = path.join(data_base, "database", "user", `${userid}.json`);
+
+    // 1. 파일 읽기
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error(`Error reading user file for ${userid}:`, err);
+            return;
+        }
+
+        // 2. 읽은 파일을 JSON으로 파싱하기
+        let userData;
+        try {
+            userData = JSON.parse(data);
+            
+        } catch (parseErr) {
+            console.error('Error parsing JSON data:', parseErr);
+            return;
+        }
+
+        return userData.username;
+    });
+}
+function create_storechat(Path,chat_number,fromuser,touser){
+    const filePath = path.join(Path, `${chat_number}.json`);
+    const initialData = {
+        "user" : [
+            fromuser , touser
+        ],
+        "chat" : [
+            
+        ]
+    };
+    // 파일에 JSON 데이터를 기록
+    fs.writeFile(filePath, JSON.stringify(initialData, null, 2), (err) => {
+        if (err) {
+            console.error('Error creating chat file:', err);
+        } else {
+            console.log(`File ${chat_number}.json created successfully at ${Path}`);
+        }
+    });
+}
+function get_time(){
+    const currentDate = new Date();
+    console.log(currentDate);  // 전체 날짜 및 시간
+    return currentDate;
+}
+function generateRandomString(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';  // 사용할 문자들
+    let result = '';
+    const charactersLength = characters.length;
+
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    return result;
 }
