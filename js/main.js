@@ -37,25 +37,21 @@ const page_loot = path.join(__dirname,"/../page");
 
 
 //html 정보가 저장된 루트
-const seller_page_loot = path.join(page_loot,"seller");
+const seller_page_loot = path.join(page_loot,"seller","page");
 const seller_pagetaplate_loot = path.join(page_loot,"seller","tamplate");
 
-const meta_page_loot = path.join(page_loot,"meta");
+const meta_page_loot = path.join(page_loot,"meta","page");
 const meta_pagetamplate_loot = path.join(page_loot,"meta","tamplate");
 
-const industry_page_loot = path.join(page_loot,"meta");
-const industry_pagetamplate_loot = path.join(page_loot,"meta","tamplate");
+const industry_page_loot = path.join(page_loot,"industry","page");
+const industry_pagetamplate_loot = path.join(page_loot,"industry","tamplate");
 
 const versionfilePath = path.join(__dirname,"/../version","page.json");
 
 
 
-// 서버 시작
-app.listen(PORT, () => {
-    const version = ReadFile(versionfilePath);
-    console.log(version);
-    console.log(`서버가 http://localhost:${PORT}에서 실행 중입니다.`);
-});
+const version = ReadFile(versionfilePath);
+console.log(version);
 
 /*
 let page_version = {
@@ -102,16 +98,21 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // 메인 페이지 라우트
 
-
-
-app.get('/seller', (req, res) => {
-    
+app.get('/', (req, res) => { //기업 소개 페이지
     let tamplate = path.join();
 
     page = applyPageToTemplate();
 
 
     res.send();
+});
+
+app.get('/seller', (req, res) => {
+    let Readtamplate = path.join(meta_pagetamplate_loot,"tamplate_0_0_1.html");
+    let Readpage = path.join(meta_page_loot,"mainhome.html");
+    page = applyPageToTemplate(Readtamplate,Readpage);
+
+    res.send(page);
 });
 
 app.get('/sellerchat', (req, res) => {
@@ -125,83 +126,6 @@ app.get('/sellerchat', (req, res) => {
 
 
     res.send(pageX);
-});
-
-app.get('/', (req, res) => {
-    const productList = products.map(product => `
-        <div class="col-md-4">
-            <div class="card mb-4 shadow-sm">
-                <img src="${product.이미지}" class="card-img-top" alt="${product.이름}">
-                <div class="card-body">
-                    <h5 class="card-title">${product.이름}</h5>
-                    <p class="card-text">${product.설명}</p>
-                    <p class="card-text">가격: ${product.가격}원</p>
-                    <form action="/api/cart/add" method="POST" style="display:inline;">
-                        <input type="hidden" name="productId" value="${product.id}">
-                        <button type="submit" class="btn btn-success">장바구니에 추가</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    `).join('');
-
-    res.send(`
-        <!DOCTYPE html>
-        <html lang="ko">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-            <title>쇼핑몰</title>
-            <style>
-                body {
-                    background-color: #f8f9fa;
-                }
-                .header {
-                    background-color: #fff;
-                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-                }
-                .logo {
-                    font-size: 24px;
-                    font-weight: bold;
-                    color: #007bff;
-                }
-            </style>
-        </head>
-        <body>
-            <header class="header">
-                <div class="container d-flex justify-content-between align-items-center py-3">
-                    <div class="logo">MyShopping</div>
-                    <input type="text" class="form-control w-50" placeholder="검색어를 입력하세요" aria-label="검색">
-                    <a href="/cart" class="btn btn-outline-primary">
-                        <i class="fas fa-shopping-cart"></i> 장바구니
-                    </a>
-                </div>
-            </header>
-            <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <div class="container">
-                    <a class="navbar-brand" href="#">카테고리</a>
-                    <div class="collapse navbar-collapse">
-                        <ul class="navbar-nav">
-                            <li class="nav-item"><a class="nav-link" href="/api/products">상품 목록</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/register">상품 등록</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-            <div class="container">
-                <h1 class="text-center">쇼핑몰에 오신 것을 환영합니다!</h1>
-                <div class="row">
-                    ${productList || '<p>등록된 상품이 없습니다.</p>'}
-                </div>
-                <div class="text-center">
-                    <p><a class="btn btn-primary" href="/api/products">상품 목록 보기</a></p>
-                </div>
-            </div>
-        </body>
-        </html>
-    `);
 });
 
 // 상품 등록 폼 페이지 seller
@@ -481,6 +405,7 @@ function applyPageToTemplate(templatePath, pagePath) {
     return template.replace(mainPageRegex, `<div id="mainpage">${pageContent}</div>`);
 }
 function readfile(templatePath) {
+    console.log(templatePath);
     return fs.readFileSync(templatePath, 'utf-8');
 }
 
@@ -578,9 +503,35 @@ function ReadFile(filePath){
             
         } catch (parseErr) {
             console.error('Error parsing JSON data:', parseErr);
-            return;
+            return ;
         }
 
         return userData;
     });
 }
+
+// 서버 시작
+app.listen(PORT, () => {
+    
+    console.log(`서버가 http://localhost:${PORT}에서 실행 중입니다.`);
+});
+
+/*   기존 루트 "/"
+const productList = products.map(product => `
+    <div class="col-md-4">
+        <div class="card mb-4 shadow-sm">
+            <img src="${product.이미지}" class="card-img-top" alt="${product.이름}">
+            <div class="card-body">
+                <h5 class="card-title">${product.이름}</h5>
+                <p class="card-text">${product.설명}</p>
+                <p class="card-text">가격: ${product.가격}원</p>
+                <form action="/api/cart/add" method="POST" style="display:inline;">
+                    <input type="hidden" name="productId" value="${product.id}">
+                    <button type="submit" class="btn btn-success">장바구니에 추가</button>
+                </form>
+            </div>
+        </div>
+    </div>
+`).join('');
+*/
+
